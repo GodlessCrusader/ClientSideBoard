@@ -1,0 +1,94 @@
+﻿@page "/play/{GameId}"
+@inject HttpClient _httpClient
+<img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
+<div ><BECanvas @ref="_canvas" Height="@height" Width="@width" ></BECanvas></div>
+<input type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="ZoomGrade"/>\
+
+@code {
+
+    [Parameter]
+    public int GameId { get; set; }
+
+    public ElementReference ImageBuffer { get; set; }
+    public string ImageBufferUrl { get; set; }
+    private int _zoomGrade = 100;
+    public int ZoomGrade {
+        get 
+        {return _zoomGrade;}
+        set 
+        { _zoomGrade = value;
+            CanvasRenderAsync();
+        }
+    }
+    public BECanvasComponent _canvas { get; set; }
+    public Canvas2DContext _canvasContext { get; set; }
+
+    public GameModel.Game Game { get; set; }
+    public GameModel.Board Board { get; set; }
+
+    public long height { get; set; } = 2000;
+    public long width { get; set; } = 1000;
+
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {     
+        
+        Game = await _httpClient.GetFromJsonAsync<GameModel.Game>(new Uri($"https://localhost:7119/api/Game/Sync/{GameId}"));
+        Board = Game.Tabs[0];
+        _canvasContext = await _canvas.CreateCanvas2DAsync();
+        await CanvasRenderAsync();
+    }
+    public async Task CanvasRenderAsync()
+    {
+       //var game = new GameModel.Game("sas", new GameModel.Player("GodlessCrusader", GameModel.Role.Owner)); 
+        height = (Board.Height)*ZoomGrade/100;
+        width = (Board.Width)*ZoomGrade/100;
+        
+        await GridRenderAsync();
+        await TokensRenderAsync();
+
+    }
+    public async Task GridRenderAsync()
+    {
+        var blackspaceSize = height/(50+1);
+        await _canvasContext.SetFillStyleAsync("black");
+        await _canvasContext.FillRectAsync(0,0,width,height);
+        await _canvasContext.SetFillStyleAsync("white");
+        await _canvasContext.FillRectAsync(blackspaceSize, blackspaceSize, width-blackspaceSize*2, height-blackspaceSize*2);
+        await _canvasContext.SetFillStyleAsync("black");
+        await _canvasContext.BeginPathAsync();
+        for(float i=blackspaceSize;i<=height-blackspaceSize;i+=blackspaceSize)
+        {
+            //await _canvasContext.FillRectAsync(i, blackspaceSize, lineWidth, height-blackspaceSize*2);
+            await _canvasContext.MoveToAsync(i, blackspaceSize);
+            await _canvasContext.LineToAsync(i, height - blackspaceSize);
+        }
+        for(float i=blackspaceSize;i<=height-blackspaceSize;i+=blackspaceSize)
+        {
+            //await _canvasContext.FillRectAsync(blackspaceSize, i, height-blackspaceSize*2, lineWidth);    
+            await _canvasContext.MoveToAsync(blackspaceSize, i);
+            await _canvasContext.LineToAsync(_canvas.Height - blackspaceSize , i);
+        }
+        await _canvasContext.StrokeAsync();
+        
+    }
+
+    public async Task TokensRenderAsync()
+    {
+
+        foreach(var t in Board.Tokens)
+        {
+            ImageBufferUrl = t.ImageUrl;
+            await _canvasContext.DrawImageAsync(ImageBuffer,(t.X - 0.5*t.Width)*ZoomGrade/100,(t.Y - 0.5*t.Height)*ZoomGrade/100, t.Width*ZoomGrade/100, t.Height*ZoomGrade/100);
+
+        }
+
+        foreach(var t in Board.BoardImages)
+        {
+            ImageBufferUrl = t.ImageUrl;
+            await _canvasContext.DrawImageAsync(ImageBuffer,(t.X - 0.5*t.Width)*ZoomGrade/100,(t.Y - 0.5*t.Height)*ZoomGrade/100, t.Width*ZoomGrade/100, t.Height*ZoomGrade/100);
+
+        }
+    }
+
+}
