@@ -1,5 +1,7 @@
-﻿@page "/play/{GameId}"
+﻿@page "/play/{GameId:int}"
 @inject HttpClient _httpClient
+
+<label>@TextArea</label>
 <img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
 <div ><BECanvas @ref="_canvas" Height="@height" Width="@width" ></BECanvas></div>
 <input type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="ZoomGrade"/>\
@@ -8,7 +10,7 @@
 
     [Parameter]
     public int GameId { get; set; }
-
+    public string TextArea { get; set; }
     public ElementReference ImageBuffer { get; set; }
     public string ImageBufferUrl { get; set; }
     private int _zoomGrade = 100;
@@ -29,18 +31,22 @@
     public long height { get; set; } = 2000;
     public long width { get; set; } = 1000;
 
-    
+    protected override async Task OnInitializedAsync()
+    {
+        TextArea = await _httpClient.GetStringAsync($"https://localhost:7119/Game/Sync/{GameId}");
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
-    {     
+    {
         
-        Game = await _httpClient.GetFromJsonAsync<GameModel.Game>(new Uri($"https://localhost:7119/api/Game/Sync/{GameId}"));
+        Game = await _httpClient.GetFromJsonAsync<GameModel.Game>(new Uri($"https://localhost:7119/Game/Sync/{GameId}"));
         Board = Game.Tabs[0];
+
         _canvasContext = await _canvas.CreateCanvas2DAsync();
         await CanvasRenderAsync();
     }
     public async Task CanvasRenderAsync()
     {
-       //var game = new GameModel.Game("sas", new GameModel.Player("GodlessCrusader", GameModel.Role.Owner)); 
+       
         height = (Board.Height)*ZoomGrade/100;
         width = (Board.Width)*ZoomGrade/100;
         
