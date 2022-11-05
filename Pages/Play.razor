@@ -1,7 +1,7 @@
 ﻿@page "/play/{GameId:int}"
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
-@inject ClientAuthentificationStateProvider _authProvider
+@inject GameRenderHandler _renderHandler
 
 <label>@TextArea</label>
 <img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
@@ -39,26 +39,21 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+            await _renderHandler.InitializeAsync(Game, _canvasContext);
+        if(!await SynchronizeGameModelAsync())
 
-        var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
-        _authProvider.Token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/Game/Sync/{GameId}");
-        request.Headers.Add("gboard_signin_token", _authProvider.Token);
-        var response = await _httpClient.SendAsync(request);
-        TextArea = await response.Content.ReadAsStringAsync();
-        Game = Newtonsoft.Json.JsonConvert.DeserializeObject<Game>(TextArea);
-        Board = Game.Tabs[0];
+            Board = Game.Tabs[0];
 
         _canvasContext = await _canvas.CreateCanvas2DAsync();
         await CanvasRenderAsync();
     }
     public async Task CanvasRenderAsync()
     {
-       
+
         height = (Board.Height)*ZoomGrade/100;
         width = (Board.Width)*ZoomGrade/100;
-        
+
         await GridRenderAsync();
         await TokensRenderAsync();
 
@@ -85,7 +80,7 @@
             await _canvasContext.LineToAsync(_canvas.Height - blackspaceSize , i);
         }
         await _canvasContext.StrokeAsync();
-        
+
     }
 
     public async Task TokensRenderAsync()
@@ -104,6 +99,31 @@
             await _canvasContext.DrawImageAsync(ImageBuffer,(t.X - 0.5*t.Width)*ZoomGrade/100,(t.Y - 0.5*t.Height)*ZoomGrade/100, t.Width*ZoomGrade/100, t.Height*ZoomGrade/100);
 
         }
+    }
+
+    public async Task<bool> SynchronizeGameModelAsync()
+    {
+        
+        try
+        {
+            var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
+            var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/Game/Sync/{GameId}");
+            request.Headers.Add("gboard_signin_token", token);
+            var response = await _httpClient.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(json))
+                return false;
+            if (Newtonsoft.Json.JsonConvert.DeserializeObject<Game>(json) == null)
+                return false;
+            Game = Newtonsoft.Json.JsonConvert.DeserializeObject<Game>(json)!;
+        }
+        catch
+        {
+            return false;
+        }
+        return true;
     }
 
 }
