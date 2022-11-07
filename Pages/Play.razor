@@ -4,9 +4,17 @@
 @inject GameRenderHandler _renderHandler
 
 <label>@TextArea</label>
+<input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
+<div id="play-container">
+    <div id="board-render-canvas">
+        <BECanvas @ref="_canvas" Height="@_renderHandler.height" Width="@_renderHandler.width"></BECanvas>
+    </div>
+    <div id="chat-contaner">
+        <ClientSideBoard.Components.Chat></ClientSideBoard.Components.Chat>
+    </div>
+</div>
 <img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
-<div ><BECanvas @ref="_canvas" Height="@_renderHandler.height" Width="@_renderHandler.width" ></BECanvas></div>
-<input type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade"/>\
+
 
 @code {
 
@@ -23,17 +31,21 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!await SynchronizeGameModelAsync())
+            throw new FileLoadException("Failed to load a game");
         if (firstRender)
         {
-            await _renderHandler.InitializeAsync(Game, _canvasContext);
+            
             _canvasContext = await _canvas.CreateCanvas2DAsync();
-            await _renderHandler.RenderBoardAsync();
+            
+            await _renderHandler.InitializeAsync(Game, _canvasContext);
+            
+            
 
         }
 
-        if (!await SynchronizeGameModelAsync())
-            throw new FileLoadException("Failed to load a game");
-        await _renderHandler.ChangeTabAsync(1);
+        await _renderHandler.RenderBoardAsync();
+        
 
     }
    

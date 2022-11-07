@@ -1,0 +1,33 @@
+﻿
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#zoom-input-range {
+    position: absolute;
+    top: 125px;
+    right: 22%;
+    transform: rotate(-90deg);
+    z-index: 1000000;
+}
+
+#board-render-canvas {
+    
+    background-color:black;
+    overflow : scroll;
+    
+}
+
+#play-container {
+    z-index:1;
+    position:fixed;
+    display: grid;
+    grid-template-columns: 80% 20%;
+    grid-template-rows: 100%;
+    top: 0;
+    bottom:0;
+    left:0;
+    right:0;
+}

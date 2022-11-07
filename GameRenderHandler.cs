@@ -9,14 +9,21 @@ namespace ClientSideBoard
     public class GameRenderHandler
     {
         private GameModel.Board _currentTab { get; set; }
-        public long height { get; private set; } = 2000;
-        public long width { get; private set; } = 1000;
+        
+        public long height { get; private set; } = 10000;
+        
+        public long width { get; private set; } = 10000;
+        
         public EventHandler GameRenderRequired;
+        
         private Canvas2DContext _canvasContext;
+        
         private GameModel.Game _gameModel;
+       
         private bool _initialized = false;
 
         private int _zoomGrade = 100;
+        
         public int ZoomGrade
         {
             get
@@ -34,7 +41,7 @@ namespace ClientSideBoard
             _canvasContext = canvas2DContext;
             _gameModel = game;
             _initialized = true;
-            await RenderBoardAsync();
+            await ChangeTabAsync(1);
         }
         public async Task ChangeTabAsync(int tabIndex)
         {
@@ -58,20 +65,25 @@ namespace ClientSideBoard
         
         private async Task RenderGridAsync()
         {
-            var blackspaceSize = height / (50 + 1);
+            await _canvasContext.BeginPathAsync();
+            var blackspaceSize = height / (_currentTab.Grid.Size + 1);
             await _canvasContext.SetFillStyleAsync("black");
             await _canvasContext.FillRectAsync(0, 0, width, height);
             await _canvasContext.SetFillStyleAsync("white");
-            await _canvasContext.FillRectAsync(blackspaceSize, blackspaceSize, width - blackspaceSize * 2, height - blackspaceSize * 2);
+            await _canvasContext.FillRectAsync(
+                x: blackspaceSize,
+                y: blackspaceSize,
+                width: blackspaceSize * (_currentTab.Grid.Size - 1),
+                height: blackspaceSize * (_currentTab.Grid.Size - 1));
             await _canvasContext.SetFillStyleAsync("black");
-            await _canvasContext.BeginPathAsync();
-            for (float i = blackspaceSize; i <= height - blackspaceSize; i += blackspaceSize)
+            
+            for (float i = blackspaceSize; i <= height - blackspaceSize * 2; i += blackspaceSize)
             {
                 //await _canvasContext.FillRectAsync(i, blackspaceSize, lineWidth, height-blackspaceSize*2);
                 await _canvasContext.MoveToAsync(i, blackspaceSize);
                 await _canvasContext.LineToAsync(i, height - blackspaceSize);
             }
-            for (float i = blackspaceSize; i <= height - blackspaceSize; i += blackspaceSize)
+            for (float i = blackspaceSize; i <= height - blackspaceSize * 2; i += blackspaceSize)
             {
                 //await _canvasContext.FillRectAsync(blackspaceSize, i, height-blackspaceSize*2, lineWidth);    
                 await _canvasContext.MoveToAsync(blackspaceSize, i);
