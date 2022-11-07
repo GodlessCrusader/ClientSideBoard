@@ -15,33 +15,26 @@
     public string TextArea { get; set; }
     public ElementReference ImageBuffer { get; set; }
     public string ImageBufferUrl { get; set; }
-    private int _zoomGrade = 100;
-    public int ZoomGrade {
-        get 
-        {
-            return _zoomGrade;
-        }
-        set 
-        { 
-            _zoomGrade = value;
-            _renderHandler.RenderBoardAsync();
-        }
-    }
+
     public BECanvasComponent _canvas { get; set; }
     public Canvas2DContext _canvasContext { get; set; }
 
     public GameModel.Game Game { get; set; }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
+        {
             await _renderHandler.InitializeAsync(Game, _canvasContext);
-        if(!await SynchronizeGameModelAsync())
+            _canvasContext = await _canvas.CreateCanvas2DAsync();
+            await _renderHandler.RenderBoardAsync();
 
-           await _renderHandler.ChangeTabAsync(1);
+        }
 
-        _canvasContext = await _canvas.CreateCanvas2DAsync();
-        await _renderHandler.RenderBoardAsync();
+        if (!await SynchronizeGameModelAsync())
+            throw new FileLoadException("Failed to load a game");
+        await _renderHandler.ChangeTabAsync(1);
+
     }
    
 

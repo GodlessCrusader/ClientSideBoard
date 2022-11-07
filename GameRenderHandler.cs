@@ -1,5 +1,6 @@
 ﻿using Blazor.Extensions.Canvas;
 using Blazor.Extensions.Canvas.Canvas2D;
+using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -14,12 +15,26 @@ namespace ClientSideBoard
         private Canvas2DContext _canvasContext;
         private GameModel.Game _gameModel;
         private bool _initialized = false;
+
+        private int _zoomGrade = 100;
+        public int ZoomGrade
+        {
+            get
+            {
+                return _zoomGrade;
+            }
+            set
+            {
+                _zoomGrade = value;
+                RenderBoardAsync();
+            }
+        }
         public async Task InitializeAsync(GameModel.Game game, Canvas2DContext canvas2DContext)
         {
             _canvasContext = canvas2DContext;
             _gameModel = game;
             _initialized = true;
-            await RnderBoardAsync();
+            await RenderBoardAsync();
         }
         public async Task ChangeTabAsync(int tabIndex)
         {
@@ -60,7 +75,7 @@ namespace ClientSideBoard
             {
                 //await _canvasContext.FillRectAsync(blackspaceSize, i, height-blackspaceSize*2, lineWidth);    
                 await _canvasContext.MoveToAsync(blackspaceSize, i);
-                await _canvasContext.LineToAsync(_canvas.Height - blackspaceSize, i);
+                await _canvasContext.LineToAsync(height - blackspaceSize, i);
             }
             await _canvasContext.StrokeAsync();
 
@@ -69,7 +84,7 @@ namespace ClientSideBoard
         private async Task RenderTokensAsync()
         {
 
-            foreach (var t in _currentTab.Tokens)
+            /*foreach (var t in _currentTab.Tokens)
             {
                 ImageBufferUrl = t.ImageUrl;
                 await _canvasContext.DrawImageAsync(ImageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
@@ -81,7 +96,7 @@ namespace ClientSideBoard
                 ImageBufferUrl = t.ImageUrl;
                 await _canvasContext.DrawImageAsync(ImageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
 
-            }
+            }*/
         }
     }
 }
