@@ -10,9 +10,10 @@ namespace ClientSideBoard
     {
         private GameModel.Board _currentTab { get; set; }
         
-        public long height { get; private set; } = 10000;
+        private ElementReference _imageBuffer { get; set; }
+        public long height { get; private set; } = 3000;
         
-        public long width { get; private set; } = 10000;
+        public long width { get; private set; } = 3000;
         
         public EventHandler GameRenderRequired;
         
@@ -36,10 +37,11 @@ namespace ClientSideBoard
                 RenderBoardAsync();
             }
         }
-        public async Task InitializeAsync(GameModel.Game game, Canvas2DContext canvas2DContext)
+        public async Task InitializeAsync(GameModel.Game game, Canvas2DContext canvas2DContext, ElementReference elementReference)
         {
             _canvasContext = canvas2DContext;
             _gameModel = game;
+            _imageBuffer = elementReference;
             _initialized = true;
             await ChangeTabAsync(1);
         }
@@ -54,29 +56,35 @@ namespace ClientSideBoard
         {
             if (!_initialized)
                 throw new InvalidOperationException("Call InitializeAsync to start render handler");
+
             
             height = (_currentTab.Height) * ZoomGrade / 100;
             width = (_currentTab.Width) * ZoomGrade / 100;
-
+            
             await RenderGridAsync();
             await RenderTokensAsync();
+            
         }
 
-        
+      
         private async Task RenderGridAsync()
         {
+            
             await _canvasContext.BeginPathAsync();
             var blackspaceSize = height / (_currentTab.Grid.Size + 1);
             await _canvasContext.SetFillStyleAsync("black");
             await _canvasContext.FillRectAsync(0, 0, width, height);
+            
+            
             await _canvasContext.SetFillStyleAsync("white");
+            
             await _canvasContext.FillRectAsync(
                 x: blackspaceSize,
                 y: blackspaceSize,
                 width: blackspaceSize * (_currentTab.Grid.Size - 1),
                 height: blackspaceSize * (_currentTab.Grid.Size - 1));
             await _canvasContext.SetFillStyleAsync("black");
-            
+            await _canvasContext.SetGlobalAlphaAsync((float)0.3);
             for (float i = blackspaceSize; i <= height - blackspaceSize * 2; i += blackspaceSize)
             {
                 //await _canvasContext.FillRectAsync(i, blackspaceSize, lineWidth, height-blackspaceSize*2);
@@ -90,25 +98,29 @@ namespace ClientSideBoard
                 await _canvasContext.LineToAsync(height - blackspaceSize, i);
             }
             await _canvasContext.StrokeAsync();
-
+            await _canvasContext.SetGlobalAlphaAsync(1);
+            
         }
 
         private async Task RenderTokensAsync()
         {
-
-            /*foreach (var t in _currentTab.Tokens)
+            var scaleDivisor = (double)ZoomGrade / 100;
+            await _canvasContext.ScaleAsync(scaleDivisor, scaleDivisor);
+            string imageBufferUrl = string.Empty;
+            foreach (var t in _currentTab.Tokens)
             {
-                ImageBufferUrl = t.ImageUrl;
-                await _canvasContext.DrawImageAsync(ImageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
+                imageBufferUrl = t.ImageUrl;
+                await _canvasContext.DrawImageAsync(_imageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
 
             }
 
-            foreach (var t in _currentTab._currentTabImages)
+            foreach (var t in _currentTab.BoardImages)
             {
-                ImageBufferUrl = t.ImageUrl;
-                await _canvasContext.DrawImageAsync(ImageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
+                imageBufferUrl = t.ImageUrl;
+                await _canvasContext.DrawImageAsync(_imageBuffer, (t.X - 0.5 * t.Width) * ZoomGrade / 100, (t.Y - 0.5 * t.Height) * ZoomGrade / 100, t.Width * ZoomGrade / 100, t.Height * ZoomGrade / 100);
 
-            }*/
+            }
+            await _canvasContext.ScaleAsync(1 / scaleDivisor, 1 / scaleDivisor);
         }
     }
 }

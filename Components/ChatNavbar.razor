@@ -1,0 +1,63 @@
+﻿
+@using GameModel
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+
+
+<div class="tab" style="z-index:5;">
+
+    <button class="tablinks" @onclick="ShowChat">Chat</button>
+    <button class="tablinks" @onclick="() => ShowElement(ref _sheetsDisplay)">Sheets</button>
+    <button class="tablinks" @onclick="() => ShowElement(ref _audioDisplay)">Audio</button>
+    <button class="tablinks" @onclick="() => ShowElement(ref _imagesDisplay)">Images</button>
+    <button class="tablinks" @onclick="() => ShowElement(ref _settingsDisplay)">Settings</button>
+    <div class="tabcontent" id="sheetsContainer" style="display:@_sheetsDisplay">sheetscontainer</div>
+    <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer</div>
+    <div class="tabcontent" id="imagesContainer" style="display:@_imagesDisplay">
+    @*    <ul>
+            @{
+                foreach (var m in User.Medias)
+                {
+                    if (m.Type == MediaType.Image)
+                    {
+                        <li><img style="height:10%; width:10%;" src="@m.Name" /></li>
+                    }
+                }
+            }
+        </ul>*@
+    </div>
+    <div class="tabcontent" id="settingsContainer" style="display:@_settingsDisplay">settingscontainer</div>
+</div>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+    //public User User { get; set; }
+    private string _sheetsDisplay = "none";
+    private string _audioDisplay = "none";
+    private string _imagesDisplay = "none";
+    private string _settingsDisplay = "none";
+    
+    protected override void OnInitialized()
+    {
+     //   User = _dbContext.Users.Where(x => x.Id == UserId).Single();
+       // User.Medias = _dbContext.Media.Where(x => x.OwnerId == UserId).ToList();
+    }
+    public void ShowChat()
+    {
+        _sheetsDisplay = "none";
+        _audioDisplay = "none";
+        _imagesDisplay = "none";
+        _settingsDisplay = "none";
+
+    }
+    public void ShowElement(ref string num)
+    {
+        ShowChat();
+        num = "block";
+    }
+
+}

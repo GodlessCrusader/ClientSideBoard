@@ -10,7 +10,7 @@
         <BECanvas @ref="_canvas" Height="@_renderHandler.height" Width="@_renderHandler.width"></BECanvas>
     </div>
     <div id="chat-contaner">
-        <ClientSideBoard.Components.Chat></ClientSideBoard.Components.Chat>
+        <Chat></Chat>
     </div>
 </div>
 <img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
@@ -38,7 +38,7 @@
             
             _canvasContext = await _canvas.CreateCanvas2DAsync();
             
-            await _renderHandler.InitializeAsync(Game, _canvasContext);
+            await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
             
             
 
