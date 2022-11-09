@@ -4,27 +4,27 @@ using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace ClientSideBoard
+namespace ClientSideBoard.Services
 {
     public class GameRenderHandler
     {
         private GameModel.Board _currentTab { get; set; }
-        
+
         private ElementReference _imageBuffer { get; set; }
         public long height { get; private set; } = 3000;
-        
+
         public long width { get; private set; } = 3000;
-        
+
         public EventHandler GameRenderRequired;
-        
+
         private Canvas2DContext _canvasContext;
-        
+
         private GameModel.Game _gameModel;
-       
+
         private bool _initialized = false;
 
         private int _zoomGrade = 100;
-        
+
         public int ZoomGrade
         {
             get
@@ -57,27 +57,27 @@ namespace ClientSideBoard
             if (!_initialized)
                 throw new InvalidOperationException("Call InitializeAsync to start render handler");
 
-            
-            height = (_currentTab.Height) * ZoomGrade / 100;
-            width = (_currentTab.Width) * ZoomGrade / 100;
-            
+
+            height = _currentTab.Height * ZoomGrade / 100;
+            width = _currentTab.Width * ZoomGrade / 100;
+
             await RenderGridAsync();
             await RenderTokensAsync();
-            
+
         }
 
-      
+
         private async Task RenderGridAsync()
         {
-            
+
             await _canvasContext.BeginPathAsync();
             var blackspaceSize = height / (_currentTab.Grid.Size + 1);
             await _canvasContext.SetFillStyleAsync("black");
             await _canvasContext.FillRectAsync(0, 0, width, height);
-            
-            
+
+
             await _canvasContext.SetFillStyleAsync("white");
-            
+
             await _canvasContext.FillRectAsync(
                 x: blackspaceSize,
                 y: blackspaceSize,
@@ -99,7 +99,7 @@ namespace ClientSideBoard
             }
             await _canvasContext.StrokeAsync();
             await _canvasContext.SetGlobalAlphaAsync(1);
-            
+
         }
 
         private async Task RenderTokensAsync()

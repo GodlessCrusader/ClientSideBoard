@@ -2,6 +2,7 @@
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 @inject GameRenderHandler _renderHandler
+@inject ServerApiCaller _apiCaller
 
 <label>@TextArea</label>
 <input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
@@ -39,8 +40,6 @@
             _canvasContext = await _canvas.CreateCanvas2DAsync();
             
             await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
-            
-            
 
         }
 
@@ -55,12 +54,8 @@
         
         try
         {
-            var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
-            var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
 
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://localhost:5001/Game/Sync/{GameId}");
-            request.Headers.Add("gboard_signin_token", token);
-            var response = await _httpClient.SendAsync(request);
+            var response = await _apiCaller.SynchronizeGameStateAsync(GameId);
             var json = await response.Content.ReadAsStringAsync();
             if (string.IsNullOrEmpty(json))
                 return false;

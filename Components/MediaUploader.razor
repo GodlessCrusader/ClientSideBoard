@@ -1,0 +1,38 @@
+﻿@inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
+
+<InputFile OnChange="UploadImageAsync">Upload Image</InputFile>
+<span class="alert-danger">@_spanText</span>
+<button class="btn-primary" @onclick="SendToServerAsync">Submit</button>
+
+@code {
+    private string _spanText = string.Empty;
+    private List<IBrowserFile> _mediaFiles;
+
+    protected override void OnInitialized()
+    {
+        //   User = _dbContext.Users.Where(x => x.Id == UserId).Single();
+        // User.Medias = _dbContext.Media.Where(x => x.OwnerId == UserId).ToList();
+    }
+    public async Task UploadImageAsync(InputFileChangeEventArgs args)
+    {
+        _mediaFiles = args.GetMultipleFiles().ToList();
+
+    }
+
+    public async Task SendToServerAsync()
+    {
+        var token = await _jsRuntime.InvokeAsync<string>("getToken", "gboard_signin_token");
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5001/UploadMedia/UploadImage");
+        request.Headers.Add("gboard_signin_token", token);
+        using MemoryStream ms = new MemoryStream();
+        foreach (var media in _mediaFiles)
+        {
+            await media.OpenReadStream().CopyToAsync(ms);
+            request.Content = new ByteArrayContent(ms.ToArray());
+            await ms.FlushAsync();
+            await _httpClient.SendAsync(request);
+        }
+        
+    }
+}
