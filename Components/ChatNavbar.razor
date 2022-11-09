@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 
-
+@inject HttpClient _httpClient
 
 <div class="tab" style="z-index:5;">
 
@@ -17,7 +17,10 @@
     <div class="tabcontent" id="sheetsContainer" style="display:@_sheetsDisplay">sheetscontainer</div>
     <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer</div>
     <div class="tabcontent" id="imagesContainer" style="display:@_imagesDisplay">
-    @*    <ul>
+    
+        <InputFile>Upload Image</InputFile>
+        <button class="btn-primary" @onclick="UploadImageAsync">Submit</button>
+        @*    <ul>
             @{
                 foreach (var m in User.Medias)
                 {
@@ -40,11 +43,17 @@
     private string _audioDisplay = "none";
     private string _imagesDisplay = "none";
     private string _settingsDisplay = "none";
-    
+
     protected override void OnInitialized()
     {
-     //   User = _dbContext.Users.Where(x => x.Id == UserId).Single();
-       // User.Medias = _dbContext.Media.Where(x => x.OwnerId == UserId).ToList();
+        //   User = _dbContext.Users.Where(x => x.Id == UserId).Single();
+        // User.Medias = _dbContext.Media.Where(x => x.OwnerId == UserId).ToList();
+    }
+    public async Task UploadImageAsync()
+    {
+        var content = new MultipartContent("img");
+        
+        await _httpClient.PostAsync("https://localhost:5001/UploadMedia/UploadImage", content);
     }
     public void ShowChat()
     {
