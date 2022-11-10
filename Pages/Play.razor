@@ -36,11 +36,12 @@
             throw new FileLoadException("Failed to load a game");
         if (firstRender)
         {
-            
-            _canvasContext = await _canvas.CreateCanvas2DAsync();
-            
-            await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
 
+            _canvasContext = await _canvas.CreateCanvas2DAsync();
+
+            await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
+            
+            return;
         }
 
         await _renderHandler.RenderBoardAsync();

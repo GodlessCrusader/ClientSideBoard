@@ -28,6 +28,17 @@ namespace ClientSideBoard.Services
 
         public async Task<HttpResponseMessage> RemoveMediaAsync(IEnumerable<string> fileNames)
         {
+            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Remove");
+
+            var content = new MultipartContent();
+
+            foreach (var fileName in fileNames)
+            {
+                content.Add(new StringContent(fileName));
+            }
+            request.Content = content;
+
+            return await _httpClient.SendAsync(request);
 
         }
 
@@ -65,7 +76,9 @@ namespace ClientSideBoard.Services
 
         public async Task<HttpResponseMessage> GetUserMediaListAsync()
         {
+            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Media/");
 
+            return await _httpClient.SendAsync(request);
         }
 
         public async Task<HttpResponseMessage> SynchronizeGameStateAsync(int gameId)
@@ -75,9 +88,11 @@ namespace ClientSideBoard.Services
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> SynchronizeChatAsync()
+        public async Task<HttpResponseMessage> SynchronizeChatAsync(int gameId)
         {
+            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Game/Chat/{gameId}");
 
+            return await _httpClient.SendAsync(request);
         }
 
 
