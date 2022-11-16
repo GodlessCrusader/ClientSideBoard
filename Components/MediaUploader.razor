@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime _jsRuntime
 @inject HttpClient _httpClient
+@inject ServerApiCaller _apiCaller
 
 <InputFile OnChange="UploadImageAsync">Upload Image</InputFile>
 <span class="alert-danger">@_spanText</span>
@@ -22,16 +23,12 @@
 
     public async Task SendToServerAsync()
     {
-        var token = await _jsRuntime.InvokeAsync<string>("getToken", "gboard_signin_token");
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:5001/UploadMedia/UploadImage");
-        request.Headers.Add("gboard_signin_token", token);
-        using MemoryStream ms = new MemoryStream();
+
         foreach (var media in _mediaFiles)
         {
-            await media.OpenReadStream().CopyToAsync(ms);
-            request.Content = new ByteArrayContent(ms.ToArray());
-            await ms.FlushAsync();
-            await _httpClient.SendAsync(request);
+            var response = await _apiCaller.UploadMediaAsync(media);
+            if (!response.IsSuccessStatusCode)
+                _spanText = "Uploading error";
         }
         
     }

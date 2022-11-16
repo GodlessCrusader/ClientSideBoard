@@ -15,9 +15,12 @@
     <button class="tablinks" @onclick="() => ShowElement(ref _imagesDisplay)">Images</button>
     <button class="tablinks" @onclick="() => ShowElement(ref _settingsDisplay)">Settings</button>
     <div class="tabcontent" id="sheetsContainer" style="display:@_sheetsDisplay">sheetscontainer</div>
-    <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer</div>
+    <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer
+
+        <MediaUploader></MediaUploader>
+    </div>
     <div class="tabcontent" id="imagesContainer" style="display:@_imagesDisplay">
-    
+        <MediaUploader></MediaUploader>
         @*    <ul>
             @{
                 foreach (var m in User.Medias)

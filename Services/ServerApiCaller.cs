@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.JSInterop;
 using System.Formats.Asn1;
+using System.IO.Pipelines;
 
 namespace ClientSideBoard.Services
 {
@@ -24,49 +25,55 @@ namespace ClientSideBoard.Services
             var request = new HttpRequestMessage(method, uri);
             request.Headers.Add("gboard_signin_token", token);
             return request;
-        }
+        } 
 
-        public async Task<HttpResponseMessage> RemoveMediaAsync(IEnumerable<string> fileNames)
+        public async Task<HttpResponseMessage> RemoveMediaAsync(MediaFile file) //to do
         {
-            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Remove");
-
-            var content = new MultipartContent();
-
-            foreach (var fileName in fileNames)
-            {
-                content.Add(new StringContent(fileName));
-            }
-            request.Content = content;
+            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Media/Remove{file.Id}");
 
             return await _httpClient.SendAsync(request);
 
         }
 
-        public async Task<HttpResponseMessage> UploadMediaAsync(IBrowserFile file)
+        public async Task<HttpResponseMessage> UploadMediaAsync(IBrowserFile file) //to do
         {
-            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}UploadMedia/UploadImage");
-            
+            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Upload");
+
+            var content = new MultipartContent();
+
+            var media = new MediaFile()
+            {
+                Type = MediaType.Image,
+                Size = file.Size,
+                UserDisplayName = file.Name
+            };
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(media);
+
             using var ms = new MemoryStream();
 
             await file.OpenReadStream().CopyToAsync(ms);
 
-            request.Content = new ByteArrayContent(ms.ToArray());
+            content.Add(new ByteArrayContent(ms.ToArray()));
+
+            content.Add(new StringContent( json));
+
+            request.Content = content;
 
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> UploadMediaAsync(IReadOnlyList<IBrowserFile> files)
+        public async Task<HttpResponseMessage> UploadMediaAsync(IReadOnlyList<IBrowserFile> files) //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}UploadMedia/UploadImage");
 
             using var ms = new MemoryStream();
 
-            var content = new MultipartContent();
+            using var content = new MultipartContent();
+            
             foreach (var file in files)
             {
-                await file.OpenReadStream().CopyToAsync(ms);
-                content.Add(new ByteArrayContent(ms.ToArray()));
-                await ms.FlushAsync();
+                content.Add(new StreamContent(file.OpenReadStream()));
             }
 
             request.Content = content;
@@ -74,21 +81,21 @@ namespace ClientSideBoard.Services
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> GetUserMediaListAsync()
+        public async Task<HttpResponseMessage> GetUserMediaListAsync() //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Media/");
 
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> SynchronizeGameStateAsync(int gameId)
+        public async Task<HttpResponseMessage> SynchronizeGameStateAsync(int gameId) //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Game/Sync/{gameId}");
 
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> SynchronizeChatAsync(int gameId)
+        public async Task<HttpResponseMessage> SynchronizeChatAsync(int gameId) //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Game/Chat/{gameId}");
 
