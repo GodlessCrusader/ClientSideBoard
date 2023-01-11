@@ -71,7 +71,7 @@ namespace ClientSideBoard.Services
 
             using var content = new MultipartFormDataContent();
 
-            //content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data");
+            content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data");
             
             foreach (var file in files)
             {
