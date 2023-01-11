@@ -35,7 +35,7 @@ namespace ClientSideBoard.Services
 
         }
 
-        public async Task<HttpResponseMessage> UploadMediaAsync(IBrowserFile file) //to do
+     /*   public async Task<HttpResponseMessage> UploadMediaAsync(IBrowserFile file) //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Upload");
 
@@ -61,15 +61,17 @@ namespace ClientSideBoard.Services
             request.Content = content;
 
             return await _httpClient.SendAsync(request);
-        }
+        }*/
 
         public async Task<HttpResponseMessage> UploadMediaAsync(IReadOnlyList<IBrowserFile> files) //to do
         {
-            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}UploadMedia/UploadImage");
+            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Upload");
 
-            using var ms = new MemoryStream();
+            //using var ms = new MemoryStream();
 
-            using var content = new MultipartContent();
+            using var content = new MultipartFormDataContent();
+
+            //content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data");
             
             foreach (var file in files)
             {
