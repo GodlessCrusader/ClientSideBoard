@@ -18,12 +18,17 @@
     public async Task UploadImageAsync(InputFileChangeEventArgs args)
     {
         _mediaFiles = new();
+        
+        
         if(args.FileCount > 1)
         {
             _mediaFiles = args.GetMultipleFiles().ToList();
             return;
         }
+
         _mediaFiles.Add(args.File);
+
+        
 
     }
 
@@ -31,6 +36,8 @@
     {
         var response = await _apiCaller.UploadMediaAsync(_mediaFiles);
         if (!response.IsSuccessStatusCode)
-            _spanText = "Uploading error";        
+            _spanText = "Uploading error";
+        else
+            _spanText = "Success";
     }
 }

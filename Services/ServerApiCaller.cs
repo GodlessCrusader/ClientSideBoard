@@ -35,39 +35,9 @@ namespace ClientSideBoard.Services
 
         }
 
-     /*   public async Task<HttpResponseMessage> UploadMediaAsync(IBrowserFile file) //to do
-        {
-            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Upload");
-
-            var content = new MultipartContent();
-
-            var media = new MediaFile()
-            {
-                Type = MediaType.Image,
-                Size = file.Size,
-                UserDisplayName = file.Name
-            };
-
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(media);
-
-            using var ms = new MemoryStream();
-
-            await file.OpenReadStream().CopyToAsync(ms);
-
-            content.Add(new ByteArrayContent(ms.ToArray()));
-
-            content.Add(new StringContent( json));
-
-            request.Content = content;
-
-            return await _httpClient.SendAsync(request);
-        }*/
-
         public async Task<HttpResponseMessage> UploadMediaAsync(IReadOnlyList<IBrowserFile> files) //to do
         {
             var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Media/Upload");
-
-            //using var ms = new MemoryStream();
 
             using var content = new MultipartFormDataContent();
 
@@ -75,7 +45,21 @@ namespace ClientSideBoard.Services
             
             foreach (var file in files)
             {
-                content.Add(new StreamContent(file.OpenReadStream()));
+                /*var resized = await file.RequestImageFileAsync(file.ContentType, 640, 480);
+                var buf = new byte[resized.Size];
+                using(var stream = file.OpenReadStream())
+                {
+                    await stream.ReadAsync(buf);
+                }
+
+                await file.OpenReadStream().CopyToAsync(ms);*/
+                var fileContent = new StreamContent(file.OpenReadStream());
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+                content.Add(
+                    content : fileContent,
+                    name: "image",
+                    fileName: file.Name);
+                
             }
 
             request.Content = content;
@@ -85,7 +69,7 @@ namespace ClientSideBoard.Services
 
         public async Task<HttpResponseMessage> GetUserMediaListAsync() //to do
         {
-            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Media/");
+            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Media/MediaList");
 
             return await _httpClient.SendAsync(request);
         }

@@ -1,0 +1,43 @@
+﻿@inject ServerApiCaller _api
+
+
+<h3>Media List</h3>
+
+<ul>
+    @{
+        if (_files == null || _files.Count == 0)
+        {
+            <label>No media</label>
+        }
+        else
+            foreach (var file in _files)
+            {
+                <li>
+                    <div>
+                        <label>@file.UserDisplayName</label>
+                        <label>Size : @file.Size bytes</label>
+                        <img src="@string.Concat(SERVER_URI,file.Uri.Replace("..", string.Empty))">
+                    </div>
+                </li>
+            }
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public MediaType Type { get; set; }
+
+    private const string SERVER_URI = "https://www.localhost:5001";
+
+    private List<MediaFile>? _files { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseMessage = await _api.GetUserMediaListAsync();
+        if (responseMessage.IsSuccessStatusCode)
+        { 
+            _files = await responseMessage.Content.ReadFromJsonAsync<List<MediaFile>>();
+            return;
+        }
+    }
+}

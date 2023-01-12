@@ -18,20 +18,11 @@
     <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer
 
         <MediaUploader></MediaUploader>
+        <MediaList></MediaList>
     </div>
     <div class="tabcontent" id="imagesContainer" style="display:@_imagesDisplay">
         <MediaUploader></MediaUploader>
-        @*    <ul>
-            @{
-                foreach (var m in User.Medias)
-                {
-                    if (m.Type == MediaType.Image)
-                    {
-                        <li><img style="height:10%; width:10%;" src="@m.Name" /></li>
-                    }
-                }
-            }
-        </ul>*@
+        <MediaList ></MediaList>
     </div>
     <div class="tabcontent" id="settingsContainer" style="display:@_settingsDisplay">settingscontainer</div>
 </div>
