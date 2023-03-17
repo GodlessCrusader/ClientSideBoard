@@ -2,7 +2,7 @@
 
 
 <h3>Media List</h3>
-
+<button class="btn-info" @onclick=RefreshAsync>Refresh</button>
 <ul>
     @{
         if (_files == null || _files.Count == 0)
@@ -31,13 +31,18 @@
 
     private List<MediaFile>? _files { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private async Task RefreshAsync()
     {
         var responseMessage = await _api.GetUserMediaListAsync();
         if (responseMessage.IsSuccessStatusCode)
-        { 
+        {
             _files = await responseMessage.Content.ReadFromJsonAsync<List<MediaFile>>();
             return;
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
     }
 }

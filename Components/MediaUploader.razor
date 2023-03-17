@@ -10,11 +10,6 @@
     private string _spanText = string.Empty;
     private List<IBrowserFile> _mediaFiles = new();
 
-    protected override void OnInitialized()
-    {
-        //   User = _dbContext.Users.Where(x => x.Id == UserId).Single();
-        // User.Medias = _dbContext.Media.Where(x => x.OwnerId == UserId).ToList();
-    }
     public async Task UploadImageAsync(InputFileChangeEventArgs args)
     {
         _mediaFiles = new();
