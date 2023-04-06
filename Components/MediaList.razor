@@ -1,28 +1,32 @@
 ﻿@inject ServerApiCaller _api
 
-
-<h3>Media List</h3>
-<button class="btn-info" @onclick=RefreshAsync>Refresh</button>
-<ul>
-    @{
-        if (_files == null || _files.Count == 0)
-        {
-            <label>No media</label>
-        }
-        else
-            foreach (var file in _files)
-            {
-                <li>
-                    <div>
-                        <label>@file.UserDisplayName</label>
-                        <label>Size : @file.Size bytes</label>
-                        <img src="@string.Concat(SERVER_URI,file.Uri.Replace("..", string.Empty))">
-                    </div>
-                </li>
-            }
+<div class="bg-dark border-1">
+    <h5>Media List</h5>
+    <button class="btn-primary my-1 bg-info" @onclick=RefreshAsync>Refresh</button>
+    @if (_files == null || _files.Count == 0)
+    {
+        <label>No media</label>
     }
-</ul>
-
+    else
+    {
+        <div class="container">
+            <ul>
+                @foreach (var file in _files)
+                {
+                    <li class="list-group-item">
+                        <div>
+                            <label>@file.UserDisplayName</label>
+                            <label>Size : @file.Size bytes</label>
+                            <img width="100" length="100" src="@string.Concat(SERVER_URI,file.Uri.Replace("..", string.Empty))">
+                        </div>
+                    </li>
+                }
+                
+            </ul>
+        </div>
+    }
+    
+</div>
 @code {
     [Parameter]
     public MediaType Type { get; set; }
@@ -37,8 +41,10 @@
         if (responseMessage.IsSuccessStatusCode)
         {
             _files = await responseMessage.Content.ReadFromJsonAsync<List<MediaFile>>();
+            StateHasChanged();
             return;
         }
+        
     }
 
     protected override async Task OnInitializedAsync()

@@ -2,28 +2,36 @@
 @inject HttpClient _httpClient
 @inject ServerApiCaller _apiCaller
 
-<InputFile OnChange="UploadImageAsync">Upload Image</InputFile>
+
+<div class="my-1">
+    <InputFile OnChange="UploadImageAsync">Upload Image</InputFile>
+</div>
+    
 <span class="alert-danger">@_spanText</span>
-<button class="btn-primary" @onclick="SendToServerAsync">Submit</button>
+<button class="btn-primary my-1 bg-info" @onclick="SendToServerAsync">Submit</button>
+
+
 
 @code {
     private string _spanText = string.Empty;
     private List<IBrowserFile> _mediaFiles = new();
 
-    public async Task UploadImageAsync(InputFileChangeEventArgs args)
+    public  Task UploadImageAsync(InputFileChangeEventArgs args)
     {
         _mediaFiles = new();
-        
-        
+
+
         if(args.FileCount > 1)
         {
             _mediaFiles = args.GetMultipleFiles().ToList();
-            return;
+            return Task.CompletedTask;
         }
 
         _mediaFiles.Add(args.File);
 
-        
+        StateHasChanged();
+
+        return Task.CompletedTask;
 
     }
 
@@ -34,5 +42,6 @@
             _spanText = "Uploading error";
         else
             _spanText = "Success";
+        StateHasChanged();
     }
 }

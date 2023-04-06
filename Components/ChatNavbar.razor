@@ -16,13 +16,24 @@
     <button class="tablinks" @onclick="() => ShowElement(ref _settingsDisplay)">Settings</button>
     <div class="tabcontent" id="sheetsContainer" style="display:@_sheetsDisplay">sheetscontainer</div>
     <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer
+        <div class="my-10">
+            <MediaUploader></MediaUploader>
+        </div>
 
-        <MediaUploader></MediaUploader>
-        <MediaList></MediaList>
+        <div class="my-10">
+            <MediaList></MediaList>
+        </div>
+        
+        
     </div>
     <div class="tabcontent" id="imagesContainer" style="display:@_imagesDisplay">
-        <MediaUploader></MediaUploader>
-        <MediaList ></MediaList>
+        <div class=" my-10">
+            <MediaUploader></MediaUploader>
+        </div>
+
+        <div class="my-10">
+            <MediaList></MediaList>
+        </div>
     </div>
     <div class="tabcontent" id="settingsContainer" style="display:@_settingsDisplay">settingscontainer</div>
 </div>
