@@ -8,14 +8,13 @@
 @inject HttpClient _httpClient
 
 <div class="tab" style="z-index:5;">
-
     <button class="tablinks" @onclick="ShowChat">Chat</button>
     <button class="tablinks" @onclick="() => ShowElement(ref _sheetsDisplay)">Sheets</button>
     <button class="tablinks" @onclick="() => ShowElement(ref _audioDisplay)">Audio</button>
     <button class="tablinks" @onclick="() => ShowElement(ref _imagesDisplay)">Images</button>
     <button class="tablinks" @onclick="() => ShowElement(ref _settingsDisplay)">Settings</button>
     <div class="tabcontent" id="sheetsContainer" style="display:@_sheetsDisplay">sheetscontainer</div>
-    <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">audiocontainer
+    <div class="tabcontent" id="audioContainer" style="display:@_audioDisplay">
         <div class="my-10">
             <MediaUploader></MediaUploader>
         </div>
@@ -31,7 +30,7 @@
             <MediaUploader></MediaUploader>
         </div>
 
-        <div class="my-10">
+        <div class="my-50">
             <MediaList></MediaList>
         </div>
     </div>

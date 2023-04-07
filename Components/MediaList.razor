@@ -1,15 +1,15 @@
 ﻿@inject ServerApiCaller _api
 
-<div class="bg-dark border-1">
+<div class="bg-dark position-relative">
     <h5>Media List</h5>
-    <button class="btn-primary my-1 bg-info" @onclick=RefreshAsync>Refresh</button>
+    <button class="btn-primary my-10 bg-info" @onclick=RefreshAsync>Refresh</button>
     @if (_files == null || _files.Count == 0)
     {
         <label>No media</label>
     }
     else
     {
-        <div class="container">
+        <div>
             <ul>
                 @foreach (var file in _files)
                 {
