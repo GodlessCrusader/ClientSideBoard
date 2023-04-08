@@ -81,13 +81,31 @@ namespace ClientSideBoard.Services
             return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> SynchronizeChatAsync(int gameId) //to do
+        public async Task<List<TextMessage>?> SynchronizeChatAsync(int gameId, IEnumerable<TextMessage> chat) //to do
         {
-            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Game/Chat/{gameId}");
+            var result = new List<TextMessage>();
+            var request = await CreateApiRequestAsync(HttpMethod.Post, $"{SERVER_URI}Game/Chat/{gameId}");
+            var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(chat);
+            request.Content = new StringContent(jsonContent,System.Text.Encoding.UTF8);
+            var response = await _httpClient.SendAsync(request);
 
-            return await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                return null;
+            var responseJsonContent = await response.Content.ReadAsStringAsync();
+            if (responseJsonContent == null)
+                return null;
+            
+            try
+            {
+                result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<TextMessage>>(responseJsonContent);
+            }
+            catch
+            {
+                return null;
+            }
+
+            return result;
         }
-
 
     }
 }
