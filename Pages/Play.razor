@@ -40,22 +40,26 @@
             _canvasContext = await _canvas.CreateCanvas2DAsync();
 
             await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
-            
+
             return;
         }
 
         await _renderHandler.RenderBoardAsync();
-        
+
 
     }
-   
+
 
     public async Task<bool> SynchronizeGameModelAsync()
     {
-        
+
         try
         {
-
+            if(GameId == 0)
+            {
+                Game = new();
+                return true;
+            }
             var response = await _apiCaller.SynchronizeGameStateAsync(GameId);
             var json = await response.Content.ReadAsStringAsync();
             if (string.IsNullOrEmpty(json))
