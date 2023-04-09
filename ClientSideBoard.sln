@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientSideBoard", "ClientSi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GodlessBoard", "..\GodlessBoard\GodlessBoard.csproj", "{091E97C3-B305-46C4-AC6C-EDEEF93A27BD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiceEngine", "..\DiceEngine\DiceEngine.csproj", "{92B726CA-09C7-4C8C-A096-0B8F0E653F9C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameModel", "..\GameModel\GameModel.csproj", "{D45D591E-FC3C-4C09-B8D6-BE2930B0E6FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{091E97C3-B305-46C4-AC6C-EDEEF93A27BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{091E97C3-B305-46C4-AC6C-EDEEF93A27BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{091E97C3-B305-46C4-AC6C-EDEEF93A27BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92B726CA-09C7-4C8C-A096-0B8F0E653F9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92B726CA-09C7-4C8C-A096-0B8F0E653F9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92B726CA-09C7-4C8C-A096-0B8F0E653F9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92B726CA-09C7-4C8C-A096-0B8F0E653F9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D45D591E-FC3C-4C09-B8D6-BE2930B0E6FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D45D591E-FC3C-4C09-B8D6-BE2930B0E6FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D45D591E-FC3C-4C09-B8D6-BE2930B0E6FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D45D591E-FC3C-4C09-B8D6-BE2930B0E6FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
