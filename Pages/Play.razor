@@ -8,11 +8,21 @@
 <input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
 <div id="play-container">
     <div id="board-render-canvas">
-        <BECanvas @ref="_canvas" Height="@_renderHandler.height" Width="@_renderHandler.width"></BECanvas>
+        <BECanvas @ref="_canvas" Height="@_renderHandler.height" Width="@_renderHandler.width"/>
     </div>
-    <div id="chat-container" class="position-relative">
-        <Chat></Chat>
+
+    <div id="chat-container">
+
+    <div><TabNavbar CurrentTab="CurrentTab" Tabs="Tabs"/></div>
+
+    <div id="chat-history-container">
+        <DynamicComponent Type="@CurrentTab.GetType()" Parameters="@CurrentTabParams"/>
     </div>
+
+    <div>
+        <ChatMessageField />
+    </div>
+</div>
 </div>
 <img @ref="@ImageBuffer" src="@ImageBufferUrl" hidden/>
 
@@ -24,9 +34,12 @@
     public string TextArea { get; set; }
     public ElementReference ImageBuffer { get; set; }
     public string ImageBufferUrl { get; set; }
-
+    public IComponent CurrentTab { get; set; } = new ChatHistoryField();
+    public Dictionary<string, object> CurrentTabParams { get; set; } = new Dictionary<string, object>();
     public BECanvasComponent _canvas { get; set; }
     public Canvas2DContext _canvasContext { get; set; }
+
+    public readonly List<Type> Tabs = new() {typeof(ChatHistoryField) };
 
     public GameModel.Game Game { get; set; }
 

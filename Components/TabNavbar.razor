@@ -1,0 +1,45 @@
+﻿
+@using GameModel
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inject HttpClient _httpClient
+
+@{
+    foreach(var tab in Tabs)
+    {
+        <button @onclick="() => CurrentTab = tab" class="tab-pane">@tab.GetType().ToString()</button>
+    }
+}
+ 
+
+@code {
+    [Parameter]
+    public IEnumerable<Type> Tabs { get; set; } = new List<Type>();
+    
+    [Parameter]
+    public IComponent CurrentTab { get; set; }
+    
+    private string _sheetsDisplay = "none";
+    private string _audioDisplay = "none";
+    private string _imagesDisplay = "none";
+    private string _settingsDisplay = "none";
+    
+
+    public void ShowChat()
+    {
+        _sheetsDisplay = "none";
+        _audioDisplay = "none";
+        _imagesDisplay = "none";
+        _settingsDisplay = "none";
+
+    }
+    public void ShowElement(ref string num)
+    {
+        ShowChat();
+        num = "block";
+    }
+
+}
