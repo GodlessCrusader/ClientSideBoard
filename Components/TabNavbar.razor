@@ -20,7 +20,7 @@
     public IEnumerable<Type> Tabs { get; set; } = new List<Type>();
     
     [Parameter]
-    public IComponent CurrentTab { get; set; }
+    public Type CurrentTab { get; set; }
     
     private string _sheetsDisplay = "none";
     private string _audioDisplay = "none";
