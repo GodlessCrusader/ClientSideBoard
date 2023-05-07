@@ -1,16 +1,18 @@
 ﻿<div>
     <ul>
         @{
-            /*foreach(var m in Message)
-            {
-                <li>
-                    <label>@string.Concat(m.Text," ", m.RecievingTime.ToString())</label>
-                </li>
-            */}
+            if(Messages == null)
+                foreach(var m in Messages)
+                {
+                    <image src="@m.UserAvatarUrl"></image>
+                    <li>
+                        <label>@string.Concat(m.UserDisplayName, m.Text," ", m.RecievingTime.ToString())</label>
+                    </li>
+                }
         }
     </ul>
 </div>
 
 @code {
-    //public IEnumerable<TextMessage> Message { get; set; }
+    public IEnumerable<TextMessage>? Messages { get; set; }
 }
