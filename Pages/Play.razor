@@ -12,11 +12,16 @@
     </div>
 
     <div id="chat-container">
-
-    <div><TabNavbar CurrentTab="CurrentTab" Tabs="Tabs"/></div>
+        <div>@{
+                foreach (var tab in Tabs) {
+                    <button @onclick="() => CurrentTab = tab.Item1" class="btn-light"> 
+                        @tab.Item2
+                    </button>
+                }  
+        }</div>
 
     <div id="chat-history-container">
-        <DynamicComponent Type="@CurrentTab.GetType()" Parameters="@CurrentTabParams"/>
+        <DynamicComponent Type="@CurrentTab" Parameters="@CurrentTabParams"/>
     </div>
 
     <div>
@@ -34,12 +39,14 @@
     public string TextArea { get; set; }
     public ElementReference ImageBuffer { get; set; }
     public string ImageBufferUrl { get; set; }
-    public IComponent CurrentTab { get; set; } = new ChatHistoryField();
+    public Type CurrentTab { get; set; } = typeof(MediaList);
     public Dictionary<string, object> CurrentTabParams { get; set; } = new Dictionary<string, object>();
     public BECanvasComponent _canvas { get; set; }
     public Canvas2DContext _canvasContext { get; set; }
 
-    public readonly List<Type> Tabs = new() {typeof(ChatHistoryField) };
+    public readonly List<(Type, string)> Tabs = new() {
+        (typeof(MediaList),"Media"),
+        (typeof(ChatHistoryField),"Chat")};
 
     public GameModel.Game Game { get; set; }
 

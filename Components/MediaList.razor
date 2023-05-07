@@ -1,7 +1,7 @@
 ﻿@inject ServerApiCaller _api
 
-<div class="bg-dark position-relative">
     <h5>Media List</h5>
+    <MediaUploader></MediaUploader>
     <button class="btn-primary my-10 bg-info" @onclick=RefreshAsync>Refresh</button>
     @if (_files == null || _files.Count == 0)
     {
@@ -26,7 +26,7 @@
         </div>
     }
     
-</div>
+
 @code {
     [Parameter]
     public MediaType Type { get; set; }

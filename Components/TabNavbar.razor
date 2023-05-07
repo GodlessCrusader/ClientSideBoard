@@ -10,23 +10,32 @@
 @{
     foreach(var tab in Tabs)
     {
-        <button @onclick="() => CurrentTab = tab" class="tab-pane">@tab.GetType().ToString()</button>
+        <button @onclick=" e => ChangeTabAsync(tab)" class="tab-pane">@tab.Name</button>
     }
+    
 }
  
 
 @code {
     [Parameter]
-    public IEnumerable<Type> Tabs { get; set; } = new List<Type>();
-    
+    public IEnumerable<Type> Tabs { get; set; } = new List<Type>() {
+        typeof(MediaList)
+    };
+
     [Parameter]
     public Type CurrentTab { get; set; }
-    
+
     private string _sheetsDisplay = "none";
     private string _audioDisplay = "none";
     private string _imagesDisplay = "none";
     private string _settingsDisplay = "none";
-    
+
+    public Task ChangeTabAsync(Type tabType)
+    {
+        CurrentTab = tabType;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
     public void ShowChat()
     {
@@ -34,7 +43,6 @@
         _audioDisplay = "none";
         _imagesDisplay = "none";
         _settingsDisplay = "none";
-
     }
     public void ShowElement(ref string num)
     {
