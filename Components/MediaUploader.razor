@@ -19,8 +19,6 @@
     public  Task UploadImageAsync(InputFileChangeEventArgs args)
     {
         _mediaFiles = new();
-
-
         if(args.FileCount > 1)
         {
             _mediaFiles = args.GetMultipleFiles().ToList();

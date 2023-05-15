@@ -12,7 +12,7 @@
     </div>
 
     <div id="chat-container">
-        <div>@{
+        <div id="tab-container">@{
                 foreach (var tab in Tabs) {
                     <button @onclick="() => CurrentTab = tab.Item1" class="btn-light"> 
                         @tab.Item2

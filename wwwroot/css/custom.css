@@ -56,6 +56,10 @@
     
 }
 
+#tab-container {
+    display: flex;
+    flex-flow: row;
+}
 
 #chat-history-container{
     background-color: beige;
