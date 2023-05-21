@@ -1,5 +1,6 @@
 ﻿using Blazor.Extensions.Canvas;
 using Blazor.Extensions.Canvas.Canvas2D;
+using GameModel;
 using Microsoft.AspNetCore.Blazor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -45,6 +46,13 @@ namespace ClientSideBoard.Services
             _initialized = true;
             await ChangeTabAsync(1);
         }
+
+        public async Task RenderUpdateAsync(Game game)
+        {
+            _gameModel = game;
+            await RenderBoardAsync();
+        }
+
         public async Task ChangeTabAsync(int tabIndex)
         {
             if (tabIndex <= 0)

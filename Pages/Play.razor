@@ -113,7 +113,7 @@
             .Build();
 
         _hubConnection.On<Game, Chat>("SendGameStateAsync", (game, chat) => {
-            _renderHandler.InitializeAsync(game, _canvasContext, ImageBuffer);
+            _renderHandler.RenderUpdateAsync(game);
         });
 
         await _hubConnection.StartAsync();
