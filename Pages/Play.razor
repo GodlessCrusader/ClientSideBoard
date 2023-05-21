@@ -1,4 +1,5 @@
 ﻿@page "/play/{GameId:int}"
+@using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 @inject GameRenderHandler _renderHandler
@@ -36,17 +37,28 @@
 
     [Parameter]
     public int GameId { get; set; }
+
     public string TextArea { get; set; }
+
     public ElementReference ImageBuffer { get; set; }
+
     public string ImageBufferUrl { get; set; }
+
     public Type CurrentTab { get; set; } = typeof(MediaList);
+
     public Dictionary<string, object> CurrentTabParams { get; set; } = new Dictionary<string, object>();
+
     public BECanvasComponent _canvas { get; set; }
+
     public Canvas2DContext _canvasContext { get; set; }
+
+    private HubConnection _hubConnection { get; set; }
 
     public readonly List<(Type, string)> Tabs = new() {
         (typeof(MediaList),"Media"),
         (typeof(ChatHistoryField),"Chat")};
+
+    private const string SERVER_URI = "https://www.localhost:5001";
 
     public GameModel.Game Game { get; set; }
 
@@ -68,7 +80,6 @@
 
 
     }
-
 
     public async Task<bool> SynchronizeGameModelAsync()
     {
@@ -95,4 +106,20 @@
         return true;
     }
 
+    public async Task ConnectToHubAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{SERVER_URI}/gamehub")
+            .Build();
+
+        _hubConnection.On<Game, Chat>("SendGameStateAsync", (game, chat) => {
+            _renderHandler.InitializeAsync(game, _canvasContext, ImageBuffer);
+        });
+
+        await _hubConnection.StartAsync();
+
+        await _hubConnection.SendAsync("JoinGameAsync");
+        
+
+    }
 }

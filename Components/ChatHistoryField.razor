@@ -1,8 +1,8 @@
 ﻿<div>
     <ul>
         @{
-            if(Messages != null)
-                foreach(var m in Messages)
+            if(Chat != null && Chat.Messages != null)
+                foreach(var m in Chat.Messages)
                 {
                     <image src="@m.UserAvatarUrl"></image>
                     <li>
@@ -15,5 +15,5 @@
 
 @code {
     [Parameter]
-    public IEnumerable<TextMessage>? Messages { get; set; }
+    public Chat? Chat { get; set; }
 }

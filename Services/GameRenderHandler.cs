@@ -57,7 +57,6 @@ namespace ClientSideBoard.Services
             if (!_initialized)
                 throw new InvalidOperationException("Call InitializeAsync to start render handler");
 
-
             height = _currentTab.Height * ZoomGrade / 100;
             width = _currentTab.Width * ZoomGrade / 100;
 
