@@ -38,6 +38,8 @@
     [Parameter]
     public int GameId { get; set; }
 
+    public Chat Chat { get; set; }
+
     public string TextArea { get; set; }
 
     public ElementReference ImageBuffer { get; set; }
@@ -112,13 +114,18 @@
             .WithUrl($"{SERVER_URI}/gamehub")
             .Build();
 
-        _hubConnection.On<Game, Chat>("SendGameStateAsync", (game, chat) => {
+        _hubConnection.On<Game>("UpdateGameState", (game) => {
             _renderHandler.RenderUpdateAsync(game);
         });
 
+        _hubConnection.On<Chat>("UpdateChatState", (chat) => {
+            Chat = chat;
+        });
+
+
         await _hubConnection.StartAsync();
 
-        await _hubConnection.SendAsync("JoinGameAsync");
+        await _hubConnection.SendAsync("JoinGameAsync", GameId);
         
 
     }
