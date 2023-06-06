@@ -15,7 +15,11 @@
     <div id="chat-container">
         <div id="tab-container">@{
                 foreach (var tab in Tabs) {
-                    <button @onclick="() => CurrentTab = tab.Item1" class="btn-light"> 
+                    <button @onclick="() => {
+                        CurrentTab = tab.Item1;
+                        CurrentTabParams.Clear();
+                        CurrentTabParams.Add(tab.Item2, tab.Item3); 
+                    }" class="btn-light"> 
                         @tab.Item2
                     </button>
                 }  
@@ -56,9 +60,7 @@
 
     private HubConnection _hubConnection { get; set; }
 
-    public readonly List<(Type, string)> Tabs = new() {
-        (typeof(MediaList),"Media"),
-        (typeof(ChatHistoryField),"Chat")};
+    public readonly List<(Type, string, object)> Tabs = new(); 
 
     private const string SERVER_URI = "https://www.localhost:5001";
 
@@ -70,6 +72,10 @@
             throw new FileLoadException("Failed to load a game");
         if (firstRender)
         {
+
+            Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
+
+            Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
 
             _canvasContext = await _canvas.CreateCanvas2DAsync();
 
