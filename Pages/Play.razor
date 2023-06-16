@@ -4,6 +4,7 @@
 @inject IJSRuntime _jsRuntime
 @inject GameRenderHandler _renderHandler
 @inject ServerApiCaller _apiCaller
+@inject AuthStateProvider _authStateProvider
 
 <label>@TextArea</label>
 <input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
@@ -29,8 +30,14 @@
         <DynamicComponent Type="@CurrentTab" Parameters="@CurrentTabParams"/>
     </div>
 
-    <div>
-        <ChatMessageField />
+    <div class="card-footer text-muted d-flex justify-content-start align-items-center align-bottom p-3" style="z-index:1;">
+        <div class="input-group mb-0">
+            <input @bind="TextArea" type="text" class="form-control" placeholder="Type message"
+                    aria-label="Recipient's username" aria-describedby="button-addon2" />
+            <button @onclick="() => SendMessageAsync(TextArea)" class="btn btn-warning" type="button" id="button-addon2" style="padding-top: .55rem;">
+                Send
+            </button>
+        </div>
     </div>
 </div>
 </div>
@@ -86,12 +93,11 @@
 
         await _renderHandler.RenderBoardAsync();
 
-
+        await ConnectToHubAsync();
     }
 
     public async Task<bool> SynchronizeGameModelAsync()
     {
-
         try
         {
             if(GameId == 0)
@@ -131,8 +137,19 @@
 
         await _hubConnection.StartAsync();
 
-        await _hubConnection.SendAsync("JoinGameAsync", GameId);
+        var state = await _authStateProvider.GetAuthenticationStateAsync();
         
+        await _hubConnection.SendAsync("JoinGameAsync", GameId, state.User.Claims.Single(x => x.Type == "Email").Value);
 
+
+    }
+
+    public async Task SendMessageAsync(string message)
+    {
+        await _hubConnection.SendAsync("RecieveMessageAsync", GameId, new TextMessage()
+        {
+            Text = message
+        });
+        TextArea = string.Empty;
     }
 }

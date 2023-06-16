@@ -81,6 +81,12 @@ namespace ClientSideBoard.Services
             return await _httpClient.SendAsync(request);
         }
 
+        public async Task<HttpResponseMessage> AuthorizeAsync()
+        {
+            var request = await CreateApiRequestAsync(HttpMethod.Get, $"{SERVER_URI}Game/Authorize/");
+            return await _httpClient.SendAsync(request);
+        }
+
         public async Task<Chat?> SynchronizeChatAsync(int gameId, Chat chat)
         {
             var result = new Chat();
