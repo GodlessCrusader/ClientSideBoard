@@ -1,16 +1,16 @@
 ﻿<div>
-    <ul>
+    
         @{
             if(Chat != null && Chat.Messages != null)
                 foreach(var m in Chat.Messages)
                 {
-                    <image src="@m.UserAvatarUrl"></image>
-                    <li>
-                        <label>@string.Concat(m.UserDisplayName, m.Text," ", m.RecievingTime.ToString())</label>
-                    </li>
+                    <img height="50" length="50" src="@string.Concat("https://www.localhost:5001" ,m.UserAvatarUrl.Replace("..", ""))">
+                    
+                        <label>@string.Concat(m.UserDisplayName, ": ", m.Text, " ", m.RecievingTime.ToString())</label>
+                    <hr>
                 }
         }
-    </ul>
+    
 </div>
 
 @code {

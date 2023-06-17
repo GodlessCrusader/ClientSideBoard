@@ -1,10 +1,11 @@
 ﻿@page "/play/{GameId:int}"
+@using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 @inject GameRenderHandler _renderHandler
 @inject ServerApiCaller _apiCaller
-@inject AuthStateProvider _authStateProvider
+@inject AuthenticationStateProvider _authStateProvider
 
 <label>@TextArea</label>
 <input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
@@ -73,6 +74,16 @@
 
     public GameModel.Game Game { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
+
+        Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
+
+        await ConnectToHubAsync();
+
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!await SynchronizeGameModelAsync())
@@ -80,20 +91,19 @@
         if (firstRender)
         {
 
-            Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
-
-            Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
 
             _canvasContext = await _canvas.CreateCanvas2DAsync();
 
             await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
+
+
 
             return;
         }
 
         await _renderHandler.RenderBoardAsync();
 
-        await ConnectToHubAsync();
+
     }
 
     public async Task<bool> SynchronizeGameModelAsync()
@@ -128,25 +138,40 @@
 
         _hubConnection.On<Game>("UpdateGameState", (game) => {
             _renderHandler.RenderUpdateAsync(game);
+            StateHasChanged();
         });
 
         _hubConnection.On<Chat>("UpdateChatState", (chat) => {
+
+            CurrentTabParams.Clear();
+
             Chat = chat;
+
+            StateHasChanged();
+
+            foreach (var m in Chat.Messages)
+                Console.WriteLine(m.UserAvatarUrl);
+
+            Console.WriteLine("UpdateChatState triggered");
+            Console.WriteLine($"Chat has {Chat.Messages.Count()} messages atm");
         });
 
 
         await _hubConnection.StartAsync();
 
-        var state = await _authStateProvider.GetAuthenticationStateAsync();
+        var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
+        var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
         
-        await _hubConnection.SendAsync("JoinGameAsync", GameId, state.User.Claims.Single(x => x.Type == "Email").Value);
+        await _hubConnection.SendAsync("JoinGameAsync", GameId, token);
 
 
     }
 
     public async Task SendMessageAsync(string message)
     {
-        await _hubConnection.SendAsync("RecieveMessageAsync", GameId, new TextMessage()
+        var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
+        var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
+        await _hubConnection.SendAsync("RecieveMessageAsync", GameId, token, new TextMessage()
         {
             Text = message
         });
