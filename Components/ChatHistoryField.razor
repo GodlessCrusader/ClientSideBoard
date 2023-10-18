@@ -1,19 +1,29 @@
 ﻿<div>
-    
-        @{
-            if(Chat != null && Chat.Messages != null)
-                foreach(var m in Chat.Messages)
-                {
-                    <img height="50" length="50" src="@string.Concat("https://www.localhost:5001" ,m.UserAvatarUrl.Replace("..", ""))">
-                    
-                        <label>@string.Concat(m.UserDisplayName, ": ", m.Text, " ", m.RecievingTime.ToString())</label>
-                    <hr>
-                }
+    @{
+        if (Chat != null && Chat.Messages != null)
+        {
+            foreach (var m in Chat.Messages)
+            {
+                <img height="50" length="50" src="@string.Concat("https://www.localhost:5001" ,m.UserAvatarUrl.Replace("..", ""))">
+
+                <label>@string.Concat(m.UserDisplayName, ": ", m.Text, " ", m.RecievingTime.ToString())</label>
+                <hr>
+            }
+        }        
+        else
+        {
+            <label class="alert-danger">Chat loading error</label>
         }
-    
+        
+    }
+
 </div>
 
 @code {
     [Parameter]
     public Chat? Chat { get; set; }
+
+    
+
+   
 }

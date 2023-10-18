@@ -20,7 +20,7 @@
                     <button @onclick="() => {
                         CurrentTab = tab.Item1;
                         CurrentTabParams.Clear();
-                        CurrentTabParams.Add(tab.Item2, tab.Item3); 
+                        CurrentTabParams.Add(tab.Item2, tab.Item3);
                     }" class="btn-light"> 
                         @tab.Item2
                     </button>
@@ -28,7 +28,7 @@
         }</div>
 
     <div id="chat-history-container">
-        <DynamicComponent Type="@CurrentTab" Parameters="@CurrentTabParams"/>
+        <DynamicComponent Type="@CurrentTab" Parameters="@CurrentTabParams" @ref="CurrentTabComponent"/>
     </div>
 
     <div class="card-footer text-muted d-flex justify-content-start align-items-center align-bottom p-3" style="z-index:1;">
@@ -50,9 +50,13 @@
     [Parameter]
     public int GameId { get; set; }
 
-    public Chat Chat { get; set; }
+    public Chat Chat { get; set; } = new();
 
     public string TextArea { get; set; }
+
+    public EventCallback<bool> ComponentStateChanged { get; set; }
+
+    public DynamicComponent CurrentTabComponent { get; set; } = new();
 
     public ElementReference ImageBuffer { get; set; }
 
@@ -76,11 +80,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await ConnectToHubAsync();
+
         Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
 
         Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
 
-        await ConnectToHubAsync();
+
 
     }
 
@@ -143,17 +149,27 @@
 
         _hubConnection.On<Chat>("UpdateChatState", (chat) => {
 
-            CurrentTabParams.Clear();
 
+            if(CurrentTabParams.Any(x => x.Key == "Chat"))
+                CurrentTabParams["Chat"] = chat;
+            
             Chat = chat;
 
-            StateHasChanged();
+            ComponentStateChanged.InvokeAsync();
 
+            Tabs.Clear();
+            
+            Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
+
+            Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
+            
+            
             foreach (var m in Chat.Messages)
                 Console.WriteLine(m.UserAvatarUrl);
 
             Console.WriteLine("UpdateChatState triggered");
             Console.WriteLine($"Chat has {Chat.Messages.Count()} messages atm");
+            StateHasChanged();
         });
 
 
@@ -161,7 +177,7 @@
 
         var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
         var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
-        
+
         await _hubConnection.SendAsync("JoinGameAsync", GameId, token);
 
 
@@ -176,5 +192,6 @@
             Text = message
         });
         TextArea = string.Empty;
+        StateHasChanged();
     }
 }
