@@ -6,6 +6,7 @@
 @inject GameRenderHandler _renderHandler
 @inject ServerApiCaller _apiCaller
 @inject AuthenticationStateProvider _authStateProvider
+@inject HubStateProvider _hub
 
 <label>@TextArea</label>
 <input id="zoom-input-range" type="range" step="2" max="200" min="20" @bind:event="oninput" @bind="_renderHandler.ZoomGrade" />
@@ -18,11 +19,10 @@
         <div id="tab-container">@{
                 foreach (var tab in Tabs) {
                     <button @onclick="() => {
-                        CurrentTab = tab.Item1;
-                        CurrentTabParams.Clear();
-                        CurrentTabParams.Add(tab.Item2, tab.Item3);
+                        CurrentTab = tab;
+                        
                     }" class="btn-light"> 
-                        @tab.Item2
+                        @tab.Name
                     </button>
                 }  
         }</div>
@@ -72,9 +72,7 @@
 
     private HubConnection _hubConnection { get; set; }
 
-    public readonly List<(Type, string, object)> Tabs = new(); 
-
-    private const string SERVER_URI = "https://www.localhost:5001";
+    public readonly List<Type> Tabs = new(); 
 
     public GameModel.Game Game { get; set; }
 
@@ -82,9 +80,9 @@
     {
         await ConnectToHubAsync();
 
-        Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
+        Tabs.Add((typeof(MediaList)));
 
-        Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
+        Tabs.Add((typeof(ChatHistoryField)));
 
 
 
@@ -138,47 +136,15 @@
 
     public async Task ConnectToHubAsync()
     {
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{SERVER_URI}/gamehub")
-            .Build();
 
-        _hubConnection.On<Game>("UpdateGameState", (game) => {
-            _renderHandler.RenderUpdateAsync(game);
-            StateHasChanged();
-        });
-
-        _hubConnection.On<Chat>("UpdateChatState", (chat) => {
-
-
-            if(CurrentTabParams.Any(x => x.Key == "Chat"))
-                CurrentTabParams["Chat"] = chat;
-            
-            Chat = chat;
-
-            ComponentStateChanged.InvokeAsync();
-
-            Tabs.Clear();
-            
-            Tabs.Add((typeof(MediaList), "Media", MediaType.Image));
-
-            Tabs.Add((typeof(ChatHistoryField), "Chat", Chat));
-            
-            
-            foreach (var m in Chat.Messages)
-                Console.WriteLine(m.UserAvatarUrl);
-
-            Console.WriteLine("UpdateChatState triggered");
-            Console.WriteLine($"Chat has {Chat.Messages.Count()} messages atm");
-            StateHasChanged();
-        });
-
-
-        await _hubConnection.StartAsync();
 
         var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
         var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
 
-        await _hubConnection.SendAsync("JoinGameAsync", GameId, token);
+        if (!_hub.IsConnected)
+            await _hub.ConnectAsync();
+
+        await _hub.Connection.SendAsync("JoinGameAsync", GameId, token);
 
 
     }
@@ -187,7 +153,7 @@
     {
         var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
         var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
-        await _hubConnection.SendAsync("RecieveMessageAsync", GameId, token, new TextMessage()
+        await _hub.Connection.SendAsync("RecieveMessageAsync", GameId, token, new TextMessage()
         {
             Text = message
         });

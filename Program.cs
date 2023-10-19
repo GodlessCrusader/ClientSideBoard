@@ -13,6 +13,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.WriteIndented = true);
 
+builder.Services.AddScoped<HubStateProvider>();
 builder.Services.AddScoped<GameRenderHandler>();
 builder.Services.AddScoped<ServerApiCaller>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();

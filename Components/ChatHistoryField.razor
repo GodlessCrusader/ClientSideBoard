@@ -1,8 +1,10 @@
-﻿<div>
+﻿@implements IDisposable
+@inject HubStateProvider _hub
+<div>
     @{
-        if (Chat != null && Chat.Messages != null)
+        if (_hub.Chat != null && _hub.Chat.Messages != null)
         {
-            foreach (var m in Chat.Messages)
+            foreach (var m in _hub.Chat.Messages)
             {
                 <img height="50" length="50" src="@string.Concat("https://www.localhost:5001" ,m.UserAvatarUrl.Replace("..", ""))">
 
@@ -20,10 +22,24 @@
 </div>
 
 @code {
-    [Parameter]
+    protected override async Task OnInitializedAsync()
+    {
+        if(!_hub.IsConnected)
+        {
+            await _hub.ConnectAsync();
+        }
+        //if(_hub.StateChangeRequired == null)
+            
+        _hub.StateChangeRequired += StateHasChanged;
+    }
+
     public Chat? Chat { get; set; }
 
-    
 
-   
+
+    public void Dispose()
+    {
+        _hub.StateChangeRequired -= StateHasChanged;
+    }
+
 }
