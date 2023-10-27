@@ -45,6 +45,7 @@ namespace ClientSideBoard.Services
 
         }
 
+        public List<MediaFile> Files { get; set; }
         public event Action StateChangeRequired;
 
         public bool IsConnected { get; set; } = false;
@@ -64,7 +65,11 @@ namespace ClientSideBoard.Services
                 StateChangeRequired.Invoke();
             });
 
-
+            _connection.On<List<MediaFile>>("UpdateUserMedia", (media) =>
+            {
+                Files = media;
+                StateChangeRequired.Invoke();
+            });
 
             await _connection.StartAsync();
 
