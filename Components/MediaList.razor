@@ -1,4 +1,5 @@
-﻿@inject ServerApiCaller _api
+﻿@implements IDisposable
+@inject ServerApiCaller _api
 @inject HubStateProvider _hub
     <h5>Media List</h5>
     <MediaUploader></MediaUploader>
@@ -37,18 +38,23 @@
 
     private async Task RefreshAsync()
     {
-        var responseMessage = await _api.GetUserMediaListAsync();
-        if (responseMessage.IsSuccessStatusCode)
+        _files = _hub.UserMedia;
+        if (_files != null)
         {
-            _files = await responseMessage.Content.ReadFromJsonAsync<List<MediaFile>>();
             StateHasChanged();
             return;
         }
-        
+
     }
 
     protected override async Task OnInitializedAsync()
     {
         await RefreshAsync();
+        _hub.StateChangeRequired += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _hub.StateChangeRequired -= StateHasChanged;
     }
 }

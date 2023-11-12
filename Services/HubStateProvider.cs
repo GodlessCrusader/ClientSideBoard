@@ -45,6 +45,19 @@ namespace ClientSideBoard.Services
 
         }
 
+        private List<MediaFile?>  _userMedia {  get; set; } = new List<MediaFile?>();
+
+        public List<MediaFile?> UserMedia
+        {
+            get
+            {
+                if (IsConnected) return _userMedia;
+                else throw new InvalidOperationException("Hub connection isn't established");
+            }
+
+            private set { _userMedia = value;}
+        }
+
         public List<MediaFile> Files { get; set; }
         public event Action StateChangeRequired;
 

@@ -83,9 +83,6 @@
         Tabs.Add((typeof(MediaList)));
 
         Tabs.Add((typeof(ChatHistoryField)));
-
-
-
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -94,13 +91,9 @@
             throw new FileLoadException("Failed to load a game");
         if (firstRender)
         {
-
-
             _canvasContext = await _canvas.CreateCanvas2DAsync();
 
             await _renderHandler.InitializeAsync(Game, _canvasContext, ImageBuffer);
-
-
 
             return;
         }
@@ -136,8 +129,6 @@
 
     public async Task ConnectToHubAsync()
     {
-
-
         var or = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/cookies.js");
         var token = await or.InvokeAsync<string>("getCookie", "gboard_signin_token");
 
@@ -145,8 +136,6 @@
             await _hub.ConnectAsync();
 
         await _hub.Connection.SendAsync("JoinGameAsync", GameId, token);
-
-
     }
 
     public async Task SendMessageAsync(string message)
