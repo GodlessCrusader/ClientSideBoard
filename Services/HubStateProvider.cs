@@ -8,7 +8,7 @@ namespace ClientSideBoard.Services
     public class HubStateProvider
     {
         
-        private const string SERVER_URI = "https://www.localhost:5001";
+        private const string SERVER_URI = "https://localhost:5001";
         private HubConnection _connection { get; set; } = null;
         public HubConnection Connection => _connection;
 
@@ -52,7 +52,7 @@ namespace ClientSideBoard.Services
             get
             {
                 if (IsConnected) return _userMedia;
-                else throw new InvalidOperationException("Hub connection isn't established");
+                else return new();
             }
 
             private set { _userMedia = value;}
